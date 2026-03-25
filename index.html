@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PRO калькулятор ротанга</title>
+
+  <link rel="stylesheet" href="css/styles.css" />
+  <script defer src="js/app.js"></script>
+</head>
+
+<body>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container">
+      <h1>PRO калькулятор ротанга</h1>
+      <p class="hero__subtitle">
+        Быстрый расчёт расхода и стоимости по геометрии, стойкам и материалу.
+      </p>
+
+      <a class="cta" href="#calculator">Начать расчёт</a>
+
+      <div class="hero-features">
+        <div class="feature-card">
+          <b>Тема</b>
+          <div>Светлая/тёмная сохраняется в `localStorage`.</div>
+        </div>
+
+        <div class="feature-card">
+          <b>Авторасчёт стоек</b>
+          <div>Можно оставить авто или задать вручную.</div>
+        </div>
+
+        <div class="feature-card">
+          <b>Итог в ₽</b>
+          <div>Округление и вывод стоимости в конце.</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Landing content -->
+  <section class="container landing">
+    <h2>Как это работает</h2>
+    <div class="landing-grid">
+      <div class="landing-card">
+        <b>1. Геометрия</b>
+        <div>Выбери форму и внеси размеры.</div>
+      </div>
+      <div class="landing-card">
+        <b>2. Стойки</b>
+        <div>Авторасчёт или ручное количество.</div>
+      </div>
+      <div class="landing-card">
+        <b>3. Материал</b>
+        <div>Плетение, шаг, толщина, цена и запас.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section id="calculator">
+    <div class="container">
+      <div class="tabs">
+        <div class="tab active" data-tab="0">Геометрия</div>
+        <div class="tab" data-tab="1">Стойки</div>
+        <div class="tab" data-tab="2">Материал</div>
+      </div>
+
+      <!-- ГЕОМЕТРИЯ -->
+      <div class="section active">
+        <div class="grid">
+          <div>
+            <label>Форма</label>
+            <select id="shape">
+              <option value="rectangle">Прямоугольник</option>
+              <option value="circle">Круг</option>
+              <option value="cylinder">Цилиндр</option>
+            </select>
+          </div>
+
+          <div id="rect">
+            <label>Длина (см)</label>
+            <input id="length" type="number" />
+
+            <label>Ширина (см)</label>
+            <input id="width" type="number" />
+          </div>
+
+          <div id="circle" style="display:none">
+            <label>Диаметр (см)</label>
+            <input id="diameter" type="number" />
+          </div>
+
+          <div id="cyl" style="display:none">
+            <label>Диаметр (см)</label>
+            <input id="cylD" type="number" />
+
+            <label>Высота (см)</label>
+            <input id="height" type="number" />
+          </div>
+        </div>
+      </div>
+
+      <!-- СТОЙКИ -->
+      <div class="section">
+        <div class="grid">
+          <div class="full">
+            <label>
+              <input type="checkbox" id="autoPosts" checked />
+              Авторасчёт
+            </label>
+          </div>
+
+          <div>
+            <label>Шаг между стойками</label>
+            <input id="spacing" type="number" value="5" />
+          </div>
+
+          <div>
+            <label>Высота стойки</label>
+            <input id="postH" type="number" value="50" />
+          </div>
+
+          <div id="manualPosts">
+            <label>Количество стоек</label>
+            <input id="posts" type="number" />
+          </div>
+        </div>
+      </div>
+
+      <!-- МАТЕРИАЛ -->
+      <div class="section">
+        <div class="grid">
+          <div>
+            <label>Тип плетения</label>
+            <select id="weaving">
+              <option value="1">Прямое</option>
+              <option value="1.4">Крест</option>
+              <option value="1.7">Ёлочка</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Шаг плетения</label>
+            <input id="step" type="number" value="2" />
+          </div>
+
+          <div>
+            <label>Толщина (мм)</label>
+            <input id="thickness" type="number" value="5" />
+          </div>
+
+          <div>
+            <label>Цена за метр (₽)</label>
+            <input id="price" type="number" value="100" />
+          </div>
+
+          <div>
+            <label>Запас (%)</label>
+            <input id="reserve" type="number" value="10" />
+          </div>
+
+          <div class="full">
+            <button type="button" id="calcBtn">Рассчитать</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="result" id="result"></div>
+
+      <!-- Переключатель темы -->
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Переключить тему">Тема</button>
+    </div>
+  </section>
+</body>
+</html>
+

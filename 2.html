@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>PRO калькулятор ротанга</title>
+
+<style>
+:root{
+    /* Цвета для светлой темы */
+    --bg: #eef1f5;
+    --text: #111;
+    --container-bg: #ffffff;
+    --shadow: 0 15px 35px rgba(0,0,0,0.1);
+    --label: #555;
+    --input-bg: #ffffff;
+    --input-border: #ccc;
+    --tab-bg: #ddd;
+    --tab-active-bg: #007bff;
+    --tab-active-text: #ffffff;
+    --result-bg: #f1f9f4;
+    --small: #666;
+    --button-bg: #007bff;
+    --button-text: #ffffff;
+}
+
+body.theme-dark{
+    /* Цвета для темной темы */
+    --bg: #0f141a;
+    --text: #e6e8eb;
+    --container-bg: #17202a;
+    --shadow: 0 15px 35px rgba(0,0,0,0.35);
+    --label: #b6bdc7;
+    --input-bg: #1b2531;
+    --input-border: #3a4a5e;
+    --tab-bg: #223144;
+    --tab-active-bg: #3b82f6;
+    --tab-active-text: #ffffff;
+    --result-bg: #13212d;
+    --small: #a5afba;
+    --button-bg: #3b82f6;
+    --button-text: #ffffff;
+}
+
+body {
+    font-family: Arial;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: var(--container-bg);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+h1 {
+    text-align: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-size: 14px;
+    color: var(--label);
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border-radius: 6px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: var(--button-bg);
+    color: var(--button-text);
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    background: var(--tab-bg);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.tab.active {
+    background: var(--tab-active-bg);
+    color: var(--tab-active-text);
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.result {
+    margin-top: 20px;
+    background: var(--result-bg);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.small {
+    font-size: 13px;
+    color: var(--small);
+}
+
+/* Кнопка переключения темы (фиксированная в правом нижнем углу) */
+.theme-toggle{
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9999;
+
+    /* Перекрываем глобальный стиль button (width: 100%) */
+    width: auto;
+    padding: 10px 14px;
+    border-radius: 9999px;
+    font-size: 14px;
+    line-height: 1;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>PRO калькулятор ротанга</h1>
+
+<div class="tabs">
+    <div class="tab active" onclick="showTab(0)">Геометрия</div>
+    <div class="tab" onclick="showTab(1)">Стойки</div>
+    <div class="tab" onclick="showTab(2)">Материал</div>
+</div>
+
+<!-- ГЕОМЕТРИЯ -->
+<div class="section active">
+<div class="grid">
+
+<div>
+<label>Форма</label>
+<select id="shape" onchange="updateForm()">
+<option value="rectangle">Прямоугольник</option>
+<option value="circle">Круг</option>
+<option value="cylinder">Цилиндр</option>
+</select>
+</div>
+
+<div id="rect">
+<label>Длина (см)</label>
+<input id="length" type="number">
+
+<label>Ширина (см)</label>
+<input id="width" type="number">
+</div>
+
+<div id="circle" style="display:none">
+<label>Диаметр (см)</label>
+<input id="diameter" type="number">
+</div>
+
+<div id="cyl" style="display:none">
+<label>Диаметр (см)</label>
+<input id="cylD" type="number">
+
+<label>Высота (см)</label>
+<input id="height" type="number">
+</div>
+
+</div>
+</div>
+
+<!-- СТОЙКИ -->
+<div class="section">
+<div class="grid">
+
+<div class="full">
+<label>
+<input type="checkbox" id="autoPosts" checked onchange="togglePosts()"> Авторасчёт
+</label>
+</div>
+
+<div>
+<label>Шаг между стойками</label>
+<input id="spacing" type="number" value="5">
+</div>
+
+<div>
+<label>Высота стойки</label>
+<input id="postH" type="number" value="50">
+</div>
+
+<div id="manualPosts">
+<label>Количество стоек</label>
+<input id="posts" type="number">
+</div>
+
+</div>
+</div>
+
+<!-- МАТЕРИАЛ -->
+<div class="section">
+<div class="grid">
+
+<div>
+<label>Тип плетения</label>
+<select id="weaving">
+<option value="1">Прямое</option>
+<option value="1.4">Крест</option>
+<option value="1.7">Ёлочка</option>
+</select>
+</div>
+
+<div>
+<label>Шаг плетения</label>
+<input id="step" type="number" value="2">
+</div>
+
+<div>
+<label>Толщина (мм)</label>
+<input id="thickness" type="number" value="5">
+</div>
+
+<div>
+<label>Цена за метр (₽)</label>
+<input id="price" type="number" value="100">
+</div>
+
+<div>
+<label>Запас (%)</label>
+<input id="reserve" type="number" value="10">
+</div>
+
+<div class="full">
+<button onclick="calc()">Рассчитать</button>
+</div>
+
+</div>
+</div>
+
+<div class="result" id="result"></div>
+
+<!-- Переключатель темы -->
+<button id="themeToggle" class="theme-toggle" type="button" aria-label="Переключить тему">Тема</button>
+
+</div>
+
+<script>
+
+const el = id => document.getElementById(id)
+
+// -------------------- Переключение светлой/темной темы --------------------
+const THEME_KEY = 'theme'
+
+function applyTheme(theme){
+    // theme: 'light' | 'dark'
+    const isDark = theme === 'dark'
+    document.body.classList.toggle('theme-dark', isDark)
+
+    // Обновляем текст и aria-label кнопки под целевую тему
+    const btn = el('themeToggle')
+    if(btn){
+        btn.textContent = isDark ? 'Светлая' : 'Тёмная'
+        btn.setAttribute('aria-label', `Переключить тему на ${isDark ? 'светлую' : 'тёмную'}`)
+    }
+}
+
+function initTheme(){
+    // 1) Пробуем достать из localStorage
+    // 2) Если нет — используем prefers-color-scheme
+    let saved = null
+    try { saved = localStorage.getItem(THEME_KEY) } catch(e) {}
+
+    if(saved === 'light' || saved === 'dark'){
+        applyTheme(saved)
+        return
+    }
+
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    applyTheme(prefersDark ? 'dark' : 'light')
+}
+
+initTheme()
+
+const btn = el('themeToggle')
+if(btn){
+    btn.addEventListener('click', ()=>{
+        const isDark = document.body.classList.contains('theme-dark')
+        const next = isDark ? 'light' : 'dark'
+        try { localStorage.setItem(THEME_KEY, next) } catch(e) {}
+        applyTheme(next)
+    })
+}
+// --------------------------------------------------------------------------
+
+function showTab(i){
+    document.querySelectorAll('.tab').forEach((t,idx)=>{
+        t.classList.toggle('active', idx===i)
+    })
+    document.querySelectorAll('.section').forEach((s,idx)=>{
+        s.classList.toggle('active', idx===i)
+    })
+}
+
+function updateForm(){
+    let s = el("shape").value
+
+    el("rect").style.display = s==='rectangle'?'block':'none'
+    el("circle").style.display = s==='circle'?'block':'none'
+    el("cyl").style.display = s==='cylinder'?'block':'none'
+}
+
+function togglePosts(){
+    el("manualPosts").style.display = el("autoPosts").checked ? 'none' : 'block'
+}
+
+function calc(){
+    let s = el("shape").value
+    let stepV = +el("step").value || 1
+    let weave = +el("weaving").value || 1
+    let thick = +el("thickness").value || 0
+    let reserveV = (+el("reserve").value || 0)/100
+    let priceV = +el("price").value || 0
+
+    let total = 0
+    let base = 0
+
+    if(s==='rectangle'){
+        let L = +el("length").value || 0
+        let W = +el("width").value || 0
+        let rows = W/stepV
+        total = rows * L
+        base = W
+    }
+    else if(s==='circle'){
+        let D = +el("diameter").value || 0
+        let C = Math.PI * D
+        let rows = D/stepV
+        total = rows * C
+        base = D
+    }
+    else{
+        let D = +el("cylD").value || 0
+        let H = +el("height").value || 0
+        let C = Math.PI * D
+        let rows = H/stepV
+        total = rows * C
+        base = C
+    }
+
+    let spacingV = +el("spacing").value || 1
+    let postH = +el("postH").value || 0
+
+    let postsCount = el("autoPosts").checked
+        ? Math.round(base/spacingV)
+        : (+el("posts").value || 0)
+
+    let gaps = Math.max(0, postsCount-1)
+    let postsLen = (postsCount*postH)+(spacingV*gaps)
+
+    let coef = 1+(thick/20)
+
+    let weavingPart = total*weave*coef
+    let postsPart = postsLen
+
+    let sum = (weavingPart + postsPart)/100
+    sum = sum*(1+reserveV)
+
+    // ✅ ОКРУГЛЕНИЕ ДО СОТЕН
+    let cost = Math.round((sum * priceV) / 100) * 100
+
+    el("result").innerHTML = `
+    <b>ИТОГ:</b><br><br>
+
+    Плетение: ${(weavingPart/100).toFixed(2)} м<br>
+    Стойки: ${(postsPart/100).toFixed(2)} м<br><br>
+
+    <b>Общий расход:</b> ${sum.toFixed(2)} м<br>
+    <b>Стоимость:</b> ${cost.toLocaleString('ru-RU')} ₽<br><br>
+
+    <div class="small">
+    Стоек: ${postsCount} шт<br>
+    Коэф плетения: ${weave}<br>
+    Толщина коэф: ${coef.toFixed(2)}
+    </div>
+    `
+}
+
+</script>
+
+</body>
+</html>

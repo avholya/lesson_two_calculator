@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>PRO калькулятор ротанга</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #eef1f5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-size: 14px;
+    color: #555;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    background: #ddd;
+    cursor: pointer;
+}
+
+.tab.active {
+    background: #007bff;
+    color: white;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.result {
+    margin-top: 20px;
+    background: #f1f9f4;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.small {
+    font-size: 13px;
+    color: #666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>PRO калькулятор ротанга</h1>
+
+<div class="tabs">
+    <div class="tab active" onclick="showTab(0)">Геометрия</div>
+    <div class="tab" onclick="showTab(1)">Стойки</div>
+    <div class="tab" onclick="showTab(2)">Материал</div>
+</div>
+
+<!-- ГЕОМЕТРИЯ -->
+<div class="section active">
+<div class="grid">
+
+<div>
+<label>Форма</label>
+<select id="shape" onchange="updateForm()">
+<option value="rectangle">Прямоугольник</option>
+<option value="circle">Круг</option>
+<option value="cylinder">Цилиндр</option>
+</select>
+</div>
+
+<div id="rect">
+<label>Длина (см)</label>
+<input id="length" type="number">
+
+<label>Ширина (см)</label>
+<input id="width" type="number">
+</div>
+
+<div id="circle" style="display:none">
+<label>Диаметр (см)</label>
+<input id="diameter" type="number">
+</div>
+
+<div id="cyl" style="display:none">
+<label>Диаметр (см)</label>
+<input id="cylD" type="number">
+
+<label>Высота (см)</label>
+<input id="height" type="number">
+</div>
+
+</div>
+</div>
+
+<!-- СТОЙКИ -->
+<div class="section">
+<div class="grid">
+
+<div class="full">
+<label>
+<input type="checkbox" id="autoPosts" checked onchange="togglePosts()"> Авторасчёт
+</label>
+</div>
+
+<div>
+<label>Шаг между стойками</label>
+<input id="spacing" type="number" value="5">
+</div>
+
+<div>
+<label>Высота стойки</label>
+<input id="postH" type="number" value="50">
+</div>
+
+<div id="manualPosts">
+<label>Количество стоек</label>
+<input id="posts" type="number">
+</div>
+
+</div>
+</div>
+
+<!-- МАТЕРИАЛ -->
+<div class="section">
+<div class="grid">
+
+<div>
+<label>Тип плетения</label>
+<select id="weaving">
+<option value="1">Прямое</option>
+<option value="1.4">Крест</option>
+<option value="1.7">Ёлочка</option>
+</select>
+</div>
+
+<div>
+<label>Шаг плетения</label>
+<input id="step" type="number" value="2">
+</div>
+
+<div>
+<label>Толщина (мм)</label>
+<input id="thickness" type="number" value="5">
+</div>
+
+<div>
+<label>Цена за метр (₽)</label>
+<input id="price" type="number" value="100">
+</div>
+
+<div>
+<label>Запас (%)</label>
+<input id="reserve" type="number" value="10">
+</div>
+
+<div class="full">
+<button onclick="calc()">Рассчитать</button>
+</div>
+
+</div>
+</div>
+
+<div class="result" id="result"></div>
+
+</div>
+
+<script>
+
+const el = id => document.getElementById(id)
+
+function showTab(i){
+    document.querySelectorAll('.tab').forEach((t,idx)=>{
+        t.classList.toggle('active', idx===i)
+    })
+    document.querySelectorAll('.section').forEach((s,idx)=>{
+        s.classList.toggle('active', idx===i)
+    })
+}
+
+function updateForm(){
+    let s = el("shape").value
+
+    el("rect").style.display = s==='rectangle'?'block':'none'
+    el("circle").style.display = s==='circle'?'block':'none'
+    el("cyl").style.display = s==='cylinder'?'block':'none'
+}
+
+function togglePosts(){
+    el("manualPosts").style.display = el("autoPosts").checked ? 'none' : 'block'
+}
+
+function calc(){
+    let s = el("shape").value
+    let stepV = +el("step").value || 1
+    let weave = +el("weaving").value || 1
+    let thick = +el("thickness").value || 0
+    let reserveV = (+el("reserve").value || 0)/100
+    let priceV = +el("price").value || 0
+
+    let total = 0
+    let base = 0
+
+    if(s==='rectangle'){
+        let L = +el("length").value || 0
+        let W = +el("width").value || 0
+        let rows = W/stepV
+        total = rows * L
+        base = W
+    }
+    else if(s==='circle'){
+        let D = +el("diameter").value || 0
+        let C = Math.PI * D
+        let rows = D/stepV
+        total = rows * C
+        base = D
+    }
+    else{
+        let D = +el("cylD").value || 0
+        let H = +el("height").value || 0
+        let C = Math.PI * D
+        let rows = H/stepV
+        total = rows * C
+        base = C
+    }
+
+    let spacingV = +el("spacing").value || 1
+    let postH = +el("postH").value || 0
+
+    let postsCount = el("autoPosts").checked
+        ? Math.round(base/spacingV)
+        : (+el("posts").value || 0)
+
+    let gaps = Math.max(0, postsCount-1)
+    let postsLen = (postsCount*postH)+(spacingV*gaps)
+
+    let coef = 1+(thick/20)
+
+    let weavingPart = total*weave*coef
+    let postsPart = postsLen
+
+    let sum = (weavingPart + postsPart)/100
+    sum = sum*(1+reserveV)
+
+    // ✅ ОКРУГЛЕНИЕ ДО СОТЕН
+    let cost = Math.round((sum * priceV) / 100) * 100
+
+    el("result").innerHTML = `
+    <b>ИТОГ:</b><br><br>
+
+    Плетение: ${(weavingPart/100).toFixed(2)} м<br>
+    Стойки: ${(postsPart/100).toFixed(2)} м<br><br>
+
+    <b>Общий расход:</b> ${sum.toFixed(2)} м<br>
+    <b>Стоимость:</b> ${cost.toLocaleString('ru-RU')} ₽<br><br>
+
+    <div class="small">
+    Стоек: ${postsCount} шт<br>
+    Коэф плетения: ${weave}<br>
+    Толщина коэф: ${coef.toFixed(2)}
+    </div>
+    `
+}
+
+</script>
+
+</body>
+</html>
